@@ -11,6 +11,7 @@ import im.bigs.pg.domain.calculation.FeeCalculator
 import im.bigs.pg.domain.payment.Payment
 import im.bigs.pg.domain.payment.PaymentStatus
 import org.springframework.stereotype.Service
+import java.time.LocalDateTime
 
 /**
  * 결제 생성 유스케이스 구현체.
@@ -39,24 +40,26 @@ class PaymentService(
 
         val approve = pgClient.approve(
             PgApproveRequest(
-                partnerId = partner.id,
                 amount = command.amount,
-                cardBin = command.cardBin,
-                cardLast4 = command.cardLast4,
-                productName = command.productName,
+                cardNumber = command.cardNumber,
+                birthDate = command.birthDate,
+                expiry = command.expiry,
+                password = command.password
             ),
         )
-        val hardcodedRate = java.math.BigDecimal("0.0300")
-        val hardcodedFixed = java.math.BigDecimal("100")
-        val (fee, net) = FeeCalculator.calculateFee(command.amount, hardcodedRate, hardcodedFixed)
+        val paymentFeePolicy = feePolicyRepository.findEffectivePolicy(command.partnerId, LocalDateTime.now())
+            ?: throw IllegalArgumentException("Partner Fee Policy not found: ${command.partnerId}")
+
+        val (fee, net) = FeeCalculator.calculateFee(command.amount, paymentFeePolicy.percentage, paymentFeePolicy.fixedFee)
+
         val payment = Payment(
             partnerId = partner.id,
             amount = command.amount,
-            appliedFeeRate = hardcodedRate,
+            appliedFeeRate = paymentFeePolicy.percentage,
             feeAmount = fee,
             netAmount = net,
-            cardBin = command.cardBin,
-            cardLast4 = command.cardLast4,
+            cardBin = command.cardNumber?.replace("-", "")?.substring(0,6),
+            cardLast4 = command.cardNumber?.takeLast(4),
             approvalCode = approve.approvalCode,
             approvedAt = approve.approvedAt,
             status = PaymentStatus.APPROVED,

@@ -13,6 +13,9 @@ dependencies {
     implementation(projects.modules.external.pgClient)
     implementation(libs.spring.boot.starter.jpa)
     implementation(libs.bundles.bootstrap)
+
+    implementation("org.springframework.boot:spring-boot-starter-webflux")
+
     testImplementation(libs.bundles.test)
     testImplementation(libs.spring.boot.starter.test) {
         exclude(module = "mockito-core")

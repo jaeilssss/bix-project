@@ -17,7 +17,7 @@ import kotlin.random.Random
  */
 @Component
 class MockPgClient : PgClientOutPort {
-    override fun supports(partnerId: Long): Boolean = partnerId % 2L == 1L
+    override fun supports(partnerId: Long): Boolean = partnerId == 1L
 
     override fun approve(request: PgApproveRequest): PgApproveResult {
         val dateOfMonth = LocalDate.now().format(DateTimeFormatter.ofPattern("MMdd"))
@@ -26,6 +26,8 @@ class MockPgClient : PgClientOutPort {
             approvalCode = "$dateOfMonth$randomDigits",
             approvedAt = LocalDateTime.now(ZoneOffset.UTC),
             status = PaymentStatus.APPROVED,
+            amount = request.amount,
+            maskedCardLast4 = request.cardNumber?.takeLast(4) ?: ""
         )
     }
 }

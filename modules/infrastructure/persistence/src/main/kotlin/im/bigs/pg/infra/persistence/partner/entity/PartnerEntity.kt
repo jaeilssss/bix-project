@@ -13,13 +13,27 @@ import jakarta.persistence.Table
  */
 @Entity
 @Table(name = "partner")
-class PartnerEntity(
+class PartnerEntity {
+
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    var id: Long? = null,
+    var id: Long? = null
     @Column(nullable = false, unique = true)
-    var code: String,
+    lateinit var code: String
     @Column(nullable = false)
-    var name: String,
+    lateinit var name: String
     @Column(nullable = false)
-    var active: Boolean = true,
-)
+    var active: Boolean = true
+
+    constructor(id: Long, code: String, name: String, active: Boolean) {
+        this.id = id
+        this.code = code
+        this.name = name
+        this.active = active
+    }
+    constructor(code: String, name: String, active: Boolean) {
+        this.code = code
+        this.name = name
+        this.active = active
+    }
+    constructor()
+}

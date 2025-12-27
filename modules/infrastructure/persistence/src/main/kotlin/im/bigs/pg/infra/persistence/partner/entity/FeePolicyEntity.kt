@@ -15,15 +15,32 @@ import java.time.Instant
  */
 @Entity
 @Table(name = "partner_fee_policy")
-class FeePolicyEntity(
+class FeePolicyEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    var id: Long? = null,
+    var id: Long? = null
     @Column(nullable = false)
-    var partnerId: Long,
+    var partnerId: Long = 0L
     @Column(nullable = false)
-    var effectiveFrom: Instant,
+    var effectiveFrom: Instant = Instant.EPOCH
     @Column(nullable = false, precision = 10, scale = 6)
-    var percentage: BigDecimal,
+    var percentage: BigDecimal = BigDecimal.ZERO
     @Column(precision = 15, scale = 0)
-    var fixedFee: BigDecimal? = null,
-)
+    var fixedFee: BigDecimal? = null
+
+    constructor()
+
+    constructor(partnerId: Long, effectiveFrom: Instant, percentage: BigDecimal, fixedFee: BigDecimal?) {
+        this.partnerId = partnerId
+        this.effectiveFrom = effectiveFrom
+        this.percentage = percentage
+        this.fixedFee = fixedFee
+    }
+
+    constructor(id: Long?, partnerId: Long, effectiveFrom: Instant, percentage: BigDecimal, fixedFee: BigDecimal?) {
+        this.id = id
+        this.partnerId = partnerId
+        this.effectiveFrom = effectiveFrom
+        this.percentage = percentage
+        this.fixedFee = fixedFee
+    }
+}
