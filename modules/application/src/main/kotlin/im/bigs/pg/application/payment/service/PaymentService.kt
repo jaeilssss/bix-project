@@ -40,11 +40,11 @@ class PaymentService(
 
         val approve = pgClient.approve(
             PgApproveRequest(
-                partnerId = partner.id,
                 amount = command.amount,
-                cardBin = command.cardBin,
-                cardLast4 = command.cardLast4,
-                productName = command.productName,
+                cardNumber = command.cardNumber,
+                birthDate = command.birthDate,
+                expiry = command.expiry,
+                password = command.password
             ),
         )
         val paymentFeePolicy = feePolicyRepository.findEffectivePolicy(command.partnerId, LocalDateTime.now())
@@ -58,8 +58,8 @@ class PaymentService(
             appliedFeeRate = paymentFeePolicy.percentage,
             feeAmount = fee,
             netAmount = net,
-            cardBin = command.cardBin,
-            cardLast4 = command.cardLast4,
+            cardBin = command.cardNumber?.replace("-", "")?.substring(0,6),
+            cardLast4 = command.cardNumber?.takeLast(4),
             approvalCode = approve.approvalCode,
             approvedAt = approve.approvedAt,
             status = PaymentStatus.APPROVED,

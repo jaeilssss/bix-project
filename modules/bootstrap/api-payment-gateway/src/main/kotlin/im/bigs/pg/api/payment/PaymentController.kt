@@ -49,9 +49,11 @@ class PaymentController(
             PaymentCommand(
                 partnerId = req.partnerId,
                 amount = req.amount,
-                cardBin = req.cardBin,
-                cardLast4 = req.cardLast4,
+                cardNumber = req.cardNumber,
                 productName = req.productName,
+                password = req.password,
+                expiry = req.expiry,
+                birthDate = req.birthDate
             ),
         )
         return ResponseEntity.ok(PaymentResponse.from(saved))

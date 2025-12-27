@@ -7,8 +7,10 @@ data class CreatePaymentRequest(
     val partnerId: Long,
     @field:Min(1)
     val amount: BigDecimal,
-    val cardBin: String? = null,
-    val cardLast4: String? = null,
+    val cardNumber: String?,
     val productName: String? = null,
+    val birthDate: String? = null,
+    val expiry: String? = null,
+    val password: String? = null
 )
 
