@@ -45,7 +45,7 @@ class PaymentEntity {
 
     constructor()
     constructor(
-        id: Long?,
+        id: Long? = null,
         partnerId: Long,
         amount: BigDecimal,
         appliedFeeRate: BigDecimal,

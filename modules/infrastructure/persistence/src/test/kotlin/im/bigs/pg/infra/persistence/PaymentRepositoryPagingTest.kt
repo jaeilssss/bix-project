@@ -31,7 +31,7 @@ class 결제저장소커서페이징Test @Autowired constructor(
                     appliedFeeRate = BigDecimal("0.0300"),
                     feeAmount = BigDecimal("30"),
                     netAmount = BigDecimal("970"),
-                    cardBin = null,
+                    cardBin = "123456",
                     cardLast4 = "%04d".format(i),
                     approvalCode = "A$i",
                     approvedAt = baseTs.plusSeconds(i.toLong()),
