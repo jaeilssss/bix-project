@@ -1,0 +1,18 @@
+services:
+  mariadb:
+    image: mariadb:10.11
+    container_name: payment-mariadb
+    restart: always
+    environment:
+      MARIADB_ROOT_PASSWORD: root
+      MARIADB_DATABASE: payment
+      MARIADB_USER: payment
+      MARIADB_PASSWORD: payment
+      TZ: Asia/Seoul
+    ports:
+      - "3306:3306"
+    volumes:
+      - mariadb-data:/var/lib/mysql
+
+volumes:
+  mariadb-data:
