@@ -7,6 +7,9 @@ import im.bigs.pg.api.payment.dto.CreatePaymentRequest
 import im.bigs.pg.api.payment.dto.PaymentResponse
 import im.bigs.pg.api.payment.dto.QueryResponse
 import im.bigs.pg.api.payment.dto.Summary
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.Parameter
+import io.swagger.v3.oas.annotations.media.Schema
 import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
@@ -43,6 +46,10 @@ class PaymentController(
      * @param req 결제 요청 본문
      * @return 생성된 결제 요약 응답
      */
+    @Operation(
+        summary = "결제 생성 API",
+        description = "외부 PG 결제 승인 후 결제 내역을 저장 합니다."
+    )
     @PostMapping
     fun create(@RequestBody req: CreatePaymentRequest): ResponseEntity<PaymentResponse> {
         val saved = paymentUseCase.pay(
@@ -73,14 +80,60 @@ class PaymentController(
      * @param limit 페이지 크기(기본 20)
      * @return 목록/통계/커서 정보
      */
+    @Operation(
+        summary = "결제 내역 조회 + 통계 API",
+        description =
+        "필터 조건에 따라 결제 내역을 조회합니다. " +
+                "커서 기반 페이지네이션을 사용합니다. " +
+                "최초 조회 시 cursor 없이 요청합니다."
+    )
     @GetMapping
     fun query(
-        @RequestParam(required = false) partnerId: Long?,
-        @RequestParam(required = false) status: String?,
-        @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") from: LocalDateTime?,
-        @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") to: LocalDateTime?,
-        @RequestParam(required = false) cursor: String?,
-        @RequestParam(defaultValue = "20") limit: Int,
+        @Parameter(
+            description = "제휴사 ID",
+            example = "2"
+        )
+        @RequestParam(required = false)
+        partnerId: Long?,
+
+        @Parameter(
+            description = "결제 상태",
+            example = "APPROVED"
+        )
+        @RequestParam(required = false)
+        status: String?,
+
+        @Parameter(
+            description = "조회 시작 시각 (inclusive)",
+            example = "2025-01-01 00:00:00"
+        )
+        @RequestParam(required = false)
+        @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+        from: LocalDateTime?,
+
+        @Parameter(
+            description = "조회 종료 시각 (exclusive)",
+            example = "2025-12-31 00:00:00"
+        )
+        @RequestParam(required = false)
+        @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+        to: LocalDateTime?,
+
+        @Parameter(
+            description =
+            "커서 기반 페이지네이션용 커서 값입니다. " +
+                    "최초 조회 시에는 전달하지 않습니다. " +
+                    "이전 응답의 nextCursor 값을 그대로 전달합니다.",
+        )
+        @RequestParam(required = false)
+        cursor: String?,
+
+        @Parameter(
+            description = "페이지 크기 (기본값: 20)",
+            example = "20"
+        )
+        @RequestParam(defaultValue = "20")
+        limit: Int,
     ): ResponseEntity<QueryResponse> {
         val res = queryPaymentsUseCase.query(
             QueryFilter(partnerId, status, from, to, cursor, limit),
