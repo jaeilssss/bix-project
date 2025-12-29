@@ -1,5 +1,7 @@
 package im.bigs.pg.application.payment.service
 
+import im.bigs.pg.application.exception.BaseException
+import im.bigs.pg.application.exception.enums.PaymentError
 import im.bigs.pg.application.partner.port.out.FeePolicyOutPort
 import im.bigs.pg.application.partner.port.out.PartnerOutPort
 import im.bigs.pg.application.payment.port.`in`.PaymentCommand
@@ -12,6 +14,8 @@ import im.bigs.pg.domain.payment.Payment
 import im.bigs.pg.domain.payment.PaymentStatus
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.ZoneOffset
 
 /**
  * 결제 생성 유스케이스 구현체.
@@ -32,11 +36,22 @@ class PaymentService(
      */
     override fun pay(command: PaymentCommand): Payment {
         val partner = partnerRepository.findById(command.partnerId)
-            ?: throw IllegalArgumentException("Partner not found: ${command.partnerId}")
-        require(partner.active) { "Partner is inactive: ${partner.id}" }
+            ?: throw BaseException(
+                PaymentError.NOT_FOUND_PARTNER_ID.httpStatusCode,
+                PaymentError.NOT_FOUND_PARTNER_ID.message
+            )
+        require(partner.active) {
+            throw BaseException(
+                PaymentError.NOT_ACTIVE_PARTNER.httpStatusCode,
+                PaymentError.NOT_ACTIVE_PARTNER.message
+            )
+        }
 
         val pgClient = pgClients.firstOrNull { it.supports(partner.id) }
-            ?: throw IllegalStateException("No PG client for partner ${partner.id}")
+            ?: throw BaseException(
+                PaymentError.NO_PG_CLIENT_FOR_PARTNER.httpStatusCode,
+                PaymentError.NO_PG_CLIENT_FOR_PARTNER.message
+            )
 
         val approve = pgClient.approve(
             PgApproveRequest(
@@ -50,10 +65,16 @@ class PaymentService(
 
         try {
             val paymentFeePolicy = feePolicyRepository.findEffectivePolicy(command.partnerId, LocalDateTime.now())
-                ?: throw IllegalArgumentException("Partner Fee Policy not found: ${command.partnerId}")
+                ?: throw BaseException(
+                    PaymentError.NOT_FOUND_FEE_POLICY.httpStatusCode,
+                    PaymentError.NOT_FOUND_FEE_POLICY.message
+                )
 
             val (fee, net) = FeeCalculator.calculateFee(command.amount, paymentFeePolicy.percentage, paymentFeePolicy.fixedFee)
-
+            val approvedAtKst = approve.approvedAt
+                .atZone(ZoneOffset.UTC)
+                .withZoneSameInstant(ZoneId.of("Asia/Seoul"))
+                .toLocalDateTime()
             val payment = Payment(
                 partnerId = partner.id,
                 amount = command.amount,
@@ -63,7 +84,7 @@ class PaymentService(
                 cardBin = command.cardNumber?.replace("-", "")?.substring(0, 6),
                 cardLast4 = command.cardNumber?.takeLast(4),
                 approvalCode = approve.approvalCode,
-                approvedAt = approve.approvedAt,
+                approvedAt = approvedAtKst,
                 status = PaymentStatus.APPROVED,
             )
 
