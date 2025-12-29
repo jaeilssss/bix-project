@@ -22,4 +22,3 @@ data class PaymentCommand(
     val expiry: String? = null,
     val password: String? = null
 )
-

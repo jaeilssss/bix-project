@@ -7,7 +7,6 @@ import im.bigs.pg.application.pg.port.out.PgApproveResult
 import im.bigs.pg.application.pg.port.out.PgClientOutPort
 import im.bigs.pg.external.PgKeyDeriver
 import im.bigs.pg.external.encrypt.Aes256GcmEncryptor
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.MediaType
 import org.springframework.web.reactive.function.client.WebClient
 
@@ -25,7 +24,6 @@ class TestPgClient(
 
     override fun supports(partnerId: Long): Boolean = partnerId == 2L
 
-
     override fun approve(request: PgApproveRequest): PgApproveResult {
         val json = ObjectMapper().registerKotlinModule().writeValueAsString(request)
         val secretKey = PgKeyDeriver.deriveAes256Key(apiKey)
@@ -38,8 +36,5 @@ class TestPgClient(
             .bodyToMono(PgApproveResult::class.java)
             .block()
             ?: throw RuntimeException("Payment request failed.")
-
     }
-
-
 }

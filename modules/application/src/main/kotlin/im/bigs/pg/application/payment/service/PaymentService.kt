@@ -2,8 +2,8 @@ package im.bigs.pg.application.payment.service
 
 import im.bigs.pg.application.partner.port.out.FeePolicyOutPort
 import im.bigs.pg.application.partner.port.out.PartnerOutPort
-import im.bigs.pg.application.payment.port.`in`.PaymentUseCase
 import im.bigs.pg.application.payment.port.`in`.PaymentCommand
+import im.bigs.pg.application.payment.port.`in`.PaymentUseCase
 import im.bigs.pg.application.payment.port.out.PaymentOutPort
 import im.bigs.pg.application.pg.port.out.PgApproveRequest
 import im.bigs.pg.application.pg.port.out.PgClientOutPort
@@ -60,7 +60,7 @@ class PaymentService(
                 appliedFeeRate = paymentFeePolicy.percentage,
                 feeAmount = fee,
                 netAmount = net,
-                cardBin = command.cardNumber?.replace("-", "")?.substring(0,6),
+                cardBin = command.cardNumber?.replace("-", "")?.substring(0, 6),
                 cardLast4 = command.cardNumber?.takeLast(4),
                 approvalCode = approve.approvalCode,
                 approvedAt = approve.approvedAt,

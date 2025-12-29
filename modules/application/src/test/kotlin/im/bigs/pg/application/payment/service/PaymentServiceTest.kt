@@ -31,7 +31,7 @@ class PaymentServiceTest {
         override fun approve(request: PgApproveRequest) =
             PgApproveResult(
                 "APPROVAL-123",
-                LocalDateTime.of(2024,1,1,0,0),
+                LocalDateTime.of(2024, 1, 1, 0, 0),
                 PaymentStatus.APPROVED,
                 amount = BigDecimal("10000"),
                 maskedCardLast4 = "1111"

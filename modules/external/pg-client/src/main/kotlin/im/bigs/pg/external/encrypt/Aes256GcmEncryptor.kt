@@ -1,7 +1,5 @@
 package im.bigs.pg.external.encrypt
 
-import java.nio.ByteBuffer
-import java.security.SecureRandom
 import java.util.Base64
 import javax.crypto.Cipher
 import javax.crypto.spec.GCMParameterSpec
