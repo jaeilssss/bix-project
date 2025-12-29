@@ -1,6 +1,5 @@
 package im.bigs.pg.api.config
 
-import im.bigs.pg.external.pg.MockPgClient
 import im.bigs.pg.external.pg.TestPgClient
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
@@ -18,5 +17,4 @@ class PgClientConfig(
 
     @Bean
     fun testPgClient() = TestPgClient(testPgBaseUrl, webClient, testPgApiKey)
-
 }

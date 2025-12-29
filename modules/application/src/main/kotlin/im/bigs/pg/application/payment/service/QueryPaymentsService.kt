@@ -1,6 +1,8 @@
 package im.bigs.pg.application.payment.service
 
-import im.bigs.pg.application.payment.port.`in`.*
+import im.bigs.pg.application.payment.port.`in`.QueryFilter
+import im.bigs.pg.application.payment.port.`in`.QueryPaymentsUseCase
+import im.bigs.pg.application.payment.port.`in`.QueryResult
 import im.bigs.pg.application.payment.port.out.PaymentOutPort
 import im.bigs.pg.application.payment.port.out.PaymentQuery
 import im.bigs.pg.application.payment.port.out.PaymentSummaryFilter
@@ -20,7 +22,7 @@ import java.util.Base64
 @Service
 class QueryPaymentsService(
     val paymentRepository: PaymentOutPort
-): QueryPaymentsUseCase {
+) : QueryPaymentsUseCase {
     /**
      * 필터를 기반으로 결제 내역을 조회합니다.
      *
@@ -36,18 +38,19 @@ class QueryPaymentsService(
         val paymentPage = paymentRepository.findBy(
             PaymentQuery(
                 partnerId = filter.partnerId,
-                status =  filter.status?.let { PaymentStatus.valueOf(it) },
+                status = filter.status?.let { PaymentStatus.valueOf(it) },
                 from = filter.from,
                 to = filter.to,
                 cursorId = decodedCursor.second,
                 cursorCreatedAt = decodedCursor.first?.let { LocalDateTime.ofInstant(decodedCursor.first, ZoneOffset.UTC) },
                 limit = filter.limit
-            ))
+            )
+        )
 
         val summary = paymentRepository.summary(
             PaymentSummaryFilter(
                 partnerId = filter.partnerId,
-                status =  filter.status?.let { PaymentStatus.valueOf(it) },
+                status = filter.status?.let { PaymentStatus.valueOf(it) },
                 from = filter.from,
                 to = filter.to
             )

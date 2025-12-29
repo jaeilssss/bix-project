@@ -73,5 +73,4 @@ class PaymentEntity {
         this.createdAt = createdAt
         this.updatedAt = updatedAt
     }
-
 }

@@ -1,15 +1,15 @@
 package im.bigs.pg.api.payment
 
-import im.bigs.pg.application.payment.port.`in`.PaymentUseCase
-import im.bigs.pg.application.payment.port.`in`.PaymentCommand
-import im.bigs.pg.application.payment.port.`in`.*
 import im.bigs.pg.api.payment.dto.CreatePaymentRequest
 import im.bigs.pg.api.payment.dto.PaymentResponse
 import im.bigs.pg.api.payment.dto.QueryResponse
 import im.bigs.pg.api.payment.dto.Summary
+import im.bigs.pg.application.payment.port.`in`.PaymentCommand
+import im.bigs.pg.application.payment.port.`in`.PaymentUseCase
+import im.bigs.pg.application.payment.port.`in`.QueryFilter
+import im.bigs.pg.application.payment.port.`in`.QueryPaymentsUseCase
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
-import io.swagger.v3.oas.annotations.media.Schema
 import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
@@ -35,10 +35,8 @@ class PaymentController(
 ) {
 
     /** 결제 생성 요청 페이로드(간소화된 필드). */
-    
 
     /** API 응답을 위한 변환용 DTO. 도메인 모델을 그대로 노출하지 않습니다. */
-    
 
     /**
      * 결제 생성.
@@ -67,7 +65,6 @@ class PaymentController(
     }
 
     /** 목록 + 통계를 포함한 조회 응답. */
-    
 
     /**
      * 결제 조회(커서 기반 페이지네이션 + 통계).
@@ -84,8 +81,8 @@ class PaymentController(
         summary = "결제 내역 조회 + 통계 API",
         description =
         "필터 조건에 따라 결제 내역을 조회합니다. " +
-                "커서 기반 페이지네이션을 사용합니다. " +
-                "최초 조회 시 cursor 없이 요청합니다."
+            "커서 기반 페이지네이션을 사용합니다. " +
+            "최초 조회 시 cursor 없이 요청합니다."
     )
     @GetMapping
     fun query(
@@ -122,8 +119,8 @@ class PaymentController(
         @Parameter(
             description =
             "커서 기반 페이지네이션용 커서 값입니다. " +
-                    "최초 조회 시에는 전달하지 않습니다. " +
-                    "이전 응답의 nextCursor 값을 그대로 전달합니다.",
+                "최초 조회 시에는 전달하지 않습니다. " +
+                "이전 응답의 nextCursor 값을 그대로 전달합니다.",
         )
         @RequestParam(required = false)
         cursor: String?,
