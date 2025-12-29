@@ -48,24 +48,32 @@ class PaymentService(
             ),
         )
 
-        val paymentFeePolicy = feePolicyRepository.findEffectivePolicy(command.partnerId, LocalDateTime.now())
-            ?: throw IllegalArgumentException("Partner Fee Policy not found: ${command.partnerId}")
+        try {
+            val paymentFeePolicy = feePolicyRepository.findEffectivePolicy(command.partnerId, LocalDateTime.now())
+                ?: throw IllegalArgumentException("Partner Fee Policy not found: ${command.partnerId}")
 
-        val (fee, net) = FeeCalculator.calculateFee(command.amount, paymentFeePolicy.percentage, paymentFeePolicy.fixedFee)
+            val (fee, net) = FeeCalculator.calculateFee(command.amount, paymentFeePolicy.percentage, paymentFeePolicy.fixedFee)
 
-        val payment = Payment(
-            partnerId = partner.id,
-            amount = command.amount,
-            appliedFeeRate = paymentFeePolicy.percentage,
-            feeAmount = fee,
-            netAmount = net,
-            cardBin = command.cardNumber?.replace("-", "")?.substring(0,6),
-            cardLast4 = command.cardNumber?.takeLast(4),
-            approvalCode = approve.approvalCode,
-            approvedAt = approve.approvedAt,
-            status = PaymentStatus.APPROVED,
-        )
+            val payment = Payment(
+                partnerId = partner.id,
+                amount = command.amount,
+                appliedFeeRate = paymentFeePolicy.percentage,
+                feeAmount = fee,
+                netAmount = net,
+                cardBin = command.cardNumber?.replace("-", "")?.substring(0,6),
+                cardLast4 = command.cardNumber?.takeLast(4),
+                approvalCode = approve.approvalCode,
+                approvedAt = approve.approvedAt,
+                status = PaymentStatus.APPROVED,
+            )
 
-        return paymentRepository.save(payment)
+            return paymentRepository.save(payment)
+        } catch (e: Exception) {
+            /***
+             * 만약 제휴사별 수수료 정책 조회 및 payment 저장 중 에러 발생 시
+             * 이미 결제 진행 된 PG 결제 내역 환불 진행 프로세스 진행
+             */
+            throw e
+        }
     }
 }
