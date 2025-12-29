@@ -33,11 +33,11 @@ class TestPgClient(
             .contentType(MediaType.APPLICATION_JSON)
             .bodyValue(mapOf("enc" to Aes256GcmEncryptor.encrypt(json, secretKey)))
             .retrieve()
-            .onStatus({it.is4xxClientError}) {response ->
+            .onStatus({ it.is4xxClientError }) { response ->
                 response.bodyToMono(String::class.java)
                     .map { throw IllegalArgumentException("PG 승인 실패 4xx") }
             }
-            .onStatus({it.is5xxServerError}) {response ->
+            .onStatus({ it.is5xxServerError }) { response ->
                 response.bodyToMono(String::class.java)
                     .map { throw IllegalArgumentException("PG 서버 오류 5xx") }
             }

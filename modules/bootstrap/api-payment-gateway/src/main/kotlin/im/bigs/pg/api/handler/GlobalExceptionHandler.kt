@@ -18,6 +18,6 @@ class GlobalExceptionHandler {
     @ExceptionHandler(IllegalArgumentException::class, IllegalStateException::class)
     fun handleIllegalArgumentException(e: RuntimeException): ResponseEntity<ErrorResponse> =
         ResponseEntity
-        .badRequest()
-        .body(ErrorResponse(code = 400, message = e.message ?: "잘못된 요청입니다."))
+            .badRequest()
+            .body(ErrorResponse(code = 400, message = e.message ?: "잘못된 요청입니다."))
 }
