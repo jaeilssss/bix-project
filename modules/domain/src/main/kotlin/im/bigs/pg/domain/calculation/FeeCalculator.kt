@@ -27,6 +27,7 @@ object FeeCalculator {
         val percentageFee = amount.multiply(rate).setScale(0, RoundingMode.HALF_UP)
         val fee = if (fixed != null) percentageFee + fixed else percentageFee
         val net = amount - fee
+        check(net >= BigDecimal.ZERO) {"정산 금액이 0보다 작을 수 없습니다."}
         return fee to net
     }
 }
