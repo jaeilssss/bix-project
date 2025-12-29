@@ -22,4 +22,7 @@ dependencies {
     }
     testImplementation(libs.spring.mockk)
     testImplementation(libs.database.h2)
+
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.5")
+
 }

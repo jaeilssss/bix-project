@@ -47,6 +47,7 @@ class PaymentService(
                 password = command.password
             ),
         )
+
         val paymentFeePolicy = feePolicyRepository.findEffectivePolicy(command.partnerId, LocalDateTime.now())
             ?: throw IllegalArgumentException("Partner Fee Policy not found: ${command.partnerId}")
 
