@@ -10,6 +10,7 @@ import im.bigs.pg.application.pg.port.out.PgClientOutPort
 import im.bigs.pg.domain.calculation.FeeCalculator
 import im.bigs.pg.domain.payment.Payment
 import im.bigs.pg.domain.payment.PaymentStatus
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 
@@ -25,6 +26,10 @@ class PaymentService(
     private val paymentRepository: PaymentOutPort,
     private val pgClients: List<PgClientOutPort>,
 ) : PaymentUseCase {
+
+    companion object {
+        private val log = LoggerFactory.getLogger(PaymentService::class.java)
+    }
     /**
      * 결제 승인/수수료 계산/저장을 순차적으로 수행합니다.
      * - 현재 예시 구현은 하드코드된 수수료(3% + 100)로 계산합니다.
@@ -37,7 +42,7 @@ class PaymentService(
 
         val pgClient = pgClients.firstOrNull { it.supports(partner.id) }
             ?: throw IllegalStateException("No PG client for partner ${partner.id}")
-
+        log.info("${command.cardNumber?.takeLast(4)}: PG Client 조회 완료 ")
         val approve = pgClient.approve(
             PgApproveRequest(
                 amount = command.amount,
@@ -47,11 +52,14 @@ class PaymentService(
                 password = command.password
             ),
         )
+        log.info("${command.cardNumber?.takeLast(4)}: PG 결제 승인 완료 ")
 
         val paymentFeePolicy = feePolicyRepository.findEffectivePolicy(command.partnerId, LocalDateTime.now())
             ?: throw IllegalArgumentException("Partner Fee Policy not found: ${command.partnerId}")
+        log.info("${command.cardNumber?.takeLast(4)}: 제휴사 별 수수료 정책 조회 완료 ")
 
         val (fee, net) = FeeCalculator.calculateFee(command.amount, paymentFeePolicy.percentage, paymentFeePolicy.fixedFee)
+        log.info("${command.cardNumber?.takeLast(4)}: 수수료 계산 완료 ")
 
         val payment = Payment(
             partnerId = partner.id,

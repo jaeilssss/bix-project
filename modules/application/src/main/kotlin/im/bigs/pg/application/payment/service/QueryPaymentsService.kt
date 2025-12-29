@@ -6,6 +6,7 @@ import im.bigs.pg.application.payment.port.out.PaymentQuery
 import im.bigs.pg.application.payment.port.out.PaymentSummaryFilter
 import im.bigs.pg.domain.payment.PaymentStatus
 import im.bigs.pg.domain.payment.PaymentSummary
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.time.Instant
 import java.time.LocalDateTime
@@ -30,6 +31,10 @@ class QueryPaymentsService(
      * @param filter 파트너/상태/기간/커서/페이지 크기
      * @return 조회 결과(목록/통계/커서)
      */
+
+    companion object {
+        private val log = LoggerFactory.getLogger(QueryPaymentsService::class.java)
+    }
     override fun query(filter: QueryFilter): QueryResult {
         val decodedCursor = decodeCursor(filter.cursor)
 
@@ -43,7 +48,7 @@ class QueryPaymentsService(
                 cursorCreatedAt = decodedCursor.first?.let { LocalDateTime.ofInstant(decodedCursor.first, ZoneOffset.UTC) },
                 limit = filter.limit
             ))
-
+        log.info("Payment Page 조회 완료")
         val summary = paymentRepository.summary(
             PaymentSummaryFilter(
                 partnerId = filter.partnerId,
@@ -52,8 +57,9 @@ class QueryPaymentsService(
                 to = filter.to
             )
         )
-
+        log.info("Payment Summary 조회 완료")
         val encodedCursor = encodeCursor(paymentPage.nextCursorCreatedAt?.toInstant(ZoneOffset.UTC), paymentPage.nextCursorId)
+        log.info("Cursor 인코딩")
 
         return QueryResult(
             items = paymentPage.items,
