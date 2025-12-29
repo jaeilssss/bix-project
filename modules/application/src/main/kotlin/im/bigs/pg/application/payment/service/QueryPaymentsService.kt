@@ -56,12 +56,19 @@ class QueryPaymentsService(
             )
         )
 
-        val encodedCursor = encodeCursor(paymentPage.nextCursorCreatedAt?.toInstant(ZoneOffset.UTC), paymentPage.nextCursorId)
+        val nextCursor = paymentPage
+            .takeIf { it.hasNext }
+            ?.let {
+                encodeCursor(
+                    it.nextCursorCreatedAt?.toInstant(ZoneOffset.UTC),
+                    it.nextCursorId
+                )
+            }
 
         return QueryResult(
             items = paymentPage.items,
             summary = PaymentSummary(count = summary.count, totalAmount = summary.totalAmount, totalNetAmount = summary.totalNetAmount),
-            nextCursor = encodedCursor,
+            nextCursor = nextCursor,
             hasNext = paymentPage.hasNext,
         )
     }

@@ -10,6 +10,7 @@ data class CreatePaymentRequest(
     @field:Schema(description = "제휴사 ID 1은MockId, 2는 TestId", example = "2")
     val partnerId: Long,
     @field:Min(1)
+    @field:Schema(description = "결제 금액", example = "1000")
     val amount: BigDecimal,
     @field:Schema(description = "결제 카드 번호", example = "1111-1111-1111-1111")
     val cardNumber: String?,
