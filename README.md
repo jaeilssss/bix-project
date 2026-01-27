@@ -142,12 +142,6 @@ POST /api/v1/payments
 - 외부 PG 연동 로직 분리 및 전략 선택 구조 적용
 - 예외 처리 및 HTTP 상태 매핑 개선
 
-## 선택 과제
-
-- 추가 PG 어댑터 구조 설계 및 전략 선택 방식 적용(partnerId=1은 MockPGClient, partnerId=2는 TestPGClient 전략 선택)
-- Swagger(OpenAPI) 문서화
-- MariaDB + Flyway 마이그레이션 적용
-
 ## 참고자료
-- [과제 내 연동 대상 API 문서](https://api-test-pg.bigs.im/docs/index.html)
+- (https://api-test-pg.bigs.im/docs/index.html)
 
