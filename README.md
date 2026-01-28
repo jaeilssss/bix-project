@@ -4,9 +4,9 @@
 - Kotlin
 - Spring Boot
 - Spring Data JPA
-- H2 / MariaDB (선택과제)
-- Flyway (선택과제)
-- Swagger (선택과제)
+- H2 / MariaDB
+- Flyway
+- Swagger 
 - WebClient (외부 PG 연동)
 
 ## 아키텍처
